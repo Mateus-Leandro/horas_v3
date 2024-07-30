@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "517412466082",
+    "project_id": "horas-v3-1751f",
+    "storage_bucket": "horas-v3-1751f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:517412466082:android:ad4b4b24c813d7492756fb",
+        "android_client_info": {
+          "package_name": "br.com.horas.v3.horas_v3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOn8CaZX75iuuBjJbzmaqPv0xLV-KqFII"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
