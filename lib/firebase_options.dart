@@ -55,7 +55,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDOn8CaZX75iuuBjJbzmaqPv0xLV-KqFII',
-    appId: '1:517412466082:android:ad4b4b24c813d7492756fb',
+    appId: '1:517412466082:android:52b8495e9a3fdfe62756fb',
     messagingSenderId: '517412466082',
     projectId: 'horas-v3-1751f',
     storageBucket: 'horas-v3-1751f.appspot.com',
@@ -67,6 +67,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '517412466082',
     projectId: 'horas-v3-1751f',
     storageBucket: 'horas-v3-1751f.appspot.com',
+    androidClientId: '517412466082-6q2udm0hi3ceiuv7r85aa6vnmou41h6o.apps.googleusercontent.com',
+    iosClientId: '517412466082-90n5ub2t8nbjlq4dtehaem3e0nms1en7.apps.googleusercontent.com',
     iosBundleId: 'br.com.horas.v3.horasV3',
   );
 

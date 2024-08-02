@@ -7,12 +7,25 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:517412466082:android:ad4b4b24c813d7492756fb",
+        "mobilesdk_app_id": "1:517412466082:android:52b8495e9a3fdfe62756fb",
         "android_client_info": {
           "package_name": "br.com.horas.v3.horas_v3"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "517412466082-krta8ohafevh1ts32gjoqhon6ermqn3h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.horas.v3.horas_v3",
+            "certificate_hash": "c975656bf12b8d80feb7912f966471c1144d2b8a"
+          }
+        },
+        {
+          "client_id": "517412466082-rga47ah4s3fspcsmjsqhhqm7v068unju.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDOn8CaZX75iuuBjJbzmaqPv0xLV-KqFII"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "517412466082-rga47ah4s3fspcsmjsqhhqm7v068unju.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "517412466082-90n5ub2t8nbjlq4dtehaem3e0nms1en7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "br.com.horas.v3.horasV3"
+              }
+            }
+          ]
         }
       }
     }
