@@ -51,8 +51,12 @@ class AuthService {
         return 'Usuário não encontrado';
       case 'wrong-password':
         return 'Senha incorreta';
+      case 'invalid-email':
+        return 'Email Inválido.';
       case 'email-already-in-use':
         return 'O email já está em uso.';
+      case 'invalid-credential':
+        return 'Email e/ou senha inválido.';
     }
     return e.code;
   }
