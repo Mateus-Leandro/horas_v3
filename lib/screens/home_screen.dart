@@ -24,6 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
+    refresh();
   }
 
   @override
@@ -41,48 +43,50 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: (listHours.isEmpty)
           ? const Center(
-              child: Text('Nada por aqui.\nVamos registrar um dia de trabalho',
-                  textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
-            )
+        child: Text('Nada por aqui.\nVamos registrar um dia de trabalho',
+            textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+      )
           : ListView(
-              padding: EdgeInsets.only(left: 4, right: 4),
-              children: List.generate(listHours.length, (index) {
-                Hour model = listHours[index];
-                return Dismissible(
-                  key: ValueKey<Hour>(model),
-                  direction: DismissDirection.endToStart,
-                  background: Container(
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 12),
-                    color: Colors.red,
-                    child: Icon(Icons.delete, color: Colors.white),
-                  ),
-                  onDismissed: (direction) {
-                    remove(model);
-                  },
-                  child: Card(
-                    elevation: 2,
-                    child: Column(
-                      children: [
-                        ListTile(
-                          onLongPress: () {},
-                          onTap: () {},
-                          leading: Icon(
-                            Icons.list_alt_rounded,
-                            size: 56,
-                          ),
-                          title: Text(
-                              'Data: ${model.data} hora: ${HourHelpers.minutosToHours(
-                            model.minutos,
-                          )}'),
-                          subtitle: Text(model.descricao!),
-                        )
-                      ],
-                    ),
-                  ),
-                );
-              }),
+        padding: EdgeInsets.only(left: 4, right: 4),
+        children: List.generate(listHours.length, (index) {
+          Hour model = listHours[index];
+          return Dismissible(
+            key: ValueKey<Hour>(model),
+            direction: DismissDirection.endToStart,
+            background: Container(
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: 12),
+              color: Colors.red,
+              child: Icon(Icons.delete, color: Colors.white),
             ),
+            onDismissed: (direction) {
+              remove(model);
+            },
+            child: Card(
+              elevation: 2,
+              child: Column(
+                children: [
+                  ListTile(
+                    onLongPress: () {
+                      showFormModal(model: model);
+                    },
+                    onTap: () {},
+                    leading: Icon(
+                      Icons.list_alt_rounded,
+                      size: 56,
+                    ),
+                    title: Text(
+                        'Data: ${model.data} hora: ${HourHelpers.minutosToHours(
+                          model.minutos,
+                        )}'),
+                    subtitle: Text(model.descricao!),
+                  )
+                ],
+              ),
+            ),
+          );
+        }),
+      ),
     );
   }
 
@@ -115,11 +119,17 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       builder: (context) {
         return Container(
-          height: MediaQuery.of(context).size.height,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height,
           padding: EdgeInsets.all(32),
           child: ListView(
             children: [
-              Text(title, style: Theme.of(context).textTheme.headlineSmall),
+              Text(title, style: Theme
+                  .of(context)
+                  .textTheme
+                  .headlineSmall),
               TextFormField(
                 controller: dataController,
                 keyboardType: TextInputType.datetime,
@@ -199,6 +209,17 @@ class _HomeScreenState extends State<HomeScreen> {
     firestore.collection(widget.user.uid).doc(model.id).delete();
     refresh();
   }
-}
 
-void refresh() {}
+  void refresh() async {
+    // double total = 0;
+    List<Hour> temp = [];
+    QuerySnapshot<Map<String, dynamic>> snapshot = await firestore.collection(widget.user.uid).get();
+    for (var doc in snapshot.docs){
+      temp.add(Hour.fromMap(doc.data()));
+    }
+    setState(() {
+      listHours = temp;
+    });
+  }
+
+}
