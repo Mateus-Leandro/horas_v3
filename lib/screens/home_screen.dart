@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:horas_v3/helpers/hour_helpers.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -25,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
+    setupFCM();
     refresh();
   }
 
@@ -43,50 +45,50 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: (listHours.isEmpty)
           ? const Center(
-        child: Text('Nada por aqui.\nVamos registrar um dia de trabalho',
-            textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
-      )
+              child: Text('Nada por aqui.\nVamos registrar um dia de trabalho',
+                  textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+            )
           : ListView(
-        padding: EdgeInsets.only(left: 4, right: 4),
-        children: List.generate(listHours.length, (index) {
-          Hour model = listHours[index];
-          return Dismissible(
-            key: ValueKey<Hour>(model),
-            direction: DismissDirection.endToStart,
-            background: Container(
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.only(right: 12),
-              color: Colors.red,
-              child: Icon(Icons.delete, color: Colors.white),
-            ),
-            onDismissed: (direction) {
-              remove(model);
-            },
-            child: Card(
-              elevation: 2,
-              child: Column(
-                children: [
-                  ListTile(
-                    onLongPress: () {
-                      showFormModal(model: model);
-                    },
-                    onTap: () {},
-                    leading: Icon(
-                      Icons.list_alt_rounded,
-                      size: 56,
+              padding: EdgeInsets.only(left: 4, right: 4),
+              children: List.generate(listHours.length, (index) {
+                Hour model = listHours[index];
+                return Dismissible(
+                  key: ValueKey<Hour>(model),
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: 12),
+                    color: Colors.red,
+                    child: Icon(Icons.delete, color: Colors.white),
+                  ),
+                  onDismissed: (direction) {
+                    remove(model);
+                  },
+                  child: Card(
+                    elevation: 2,
+                    child: Column(
+                      children: [
+                        ListTile(
+                          onLongPress: () {
+                            showFormModal(model: model);
+                          },
+                          onTap: () {},
+                          leading: Icon(
+                            Icons.list_alt_rounded,
+                            size: 56,
+                          ),
+                          title: Text(
+                              'Data: ${model.data} hora: ${HourHelpers.minutosToHours(
+                            model.minutos,
+                          )}'),
+                          subtitle: Text(model.descricao!),
+                        )
+                      ],
                     ),
-                    title: Text(
-                        'Data: ${model.data} hora: ${HourHelpers.minutosToHours(
-                          model.minutos,
-                        )}'),
-                    subtitle: Text(model.descricao!),
-                  )
-                ],
-              ),
+                  ),
+                );
+              }),
             ),
-          );
-        }),
-      ),
     );
   }
 
@@ -119,17 +121,11 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       builder: (context) {
         return Container(
-          height: MediaQuery
-              .of(context)
-              .size
-              .height,
+          height: MediaQuery.of(context).size.height,
           padding: EdgeInsets.all(32),
           child: ListView(
             children: [
-              Text(title, style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineSmall),
+              Text(title, style: Theme.of(context).textTheme.headlineSmall),
               TextFormField(
                 controller: dataController,
                 keyboardType: TextInputType.datetime,
@@ -213,13 +209,46 @@ class _HomeScreenState extends State<HomeScreen> {
   void refresh() async {
     // double total = 0;
     List<Hour> temp = [];
-    QuerySnapshot<Map<String, dynamic>> snapshot = await firestore.collection(widget.user.uid).get();
-    for (var doc in snapshot.docs){
+    QuerySnapshot<Map<String, dynamic>> snapshot =
+        await firestore.collection(widget.user.uid).get();
+    for (var doc in snapshot.docs) {
       temp.add(Hour.fromMap(doc.data()));
     }
     setState(() {
       listHours = temp;
     });
   }
+}
 
+void setupFCM() async {
+  final fcnToken = await FirebaseMessaging.instance.getToken();
+  print('Token: ${fcnToken}');
+
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: true,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    print('User granted permission');
+  } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    print('User granted provisional permission');
+  } else {
+    print('User declined or has not accepted permission');
+  }
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Got a message whilist in the foreground!');
+    print('### já funciona Message data: ${message.data}');
+
+    if (message.notification != null) {
+      print('Message also contained a notification: ${message.notification}');
+    }
+  });
 }
