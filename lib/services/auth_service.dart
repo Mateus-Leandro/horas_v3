@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   Future<String?> entrarUsuario(
       {required String email, required String senha}) async {
@@ -12,6 +13,17 @@ class AuthService {
       return erroLogin(e);
     }
     return null;
+  }
+
+  Future<UserCredential> singinWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser!.authentication;
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    return await _firebaseAuth.signInWithCredential(credential);
   }
 
   Future<String?> cadastrarUsuario(
@@ -61,10 +73,14 @@ class AuthService {
     return e.code;
   }
 
-  Future<String?> excluirConta({required String senha}) async {
+  Future<String?> excluirConta({required String? senha}) async {
     try {
-      await _firebaseAuth.signInWithEmailAndPassword(
-          email: _firebaseAuth.currentUser!.email!, password: senha);
+      if (senha != null) {
+        await _firebaseAuth.signInWithEmailAndPassword(
+            email: _firebaseAuth.currentUser!.email!, password: senha);
+      } else {
+        await singinWithGoogle();
+      }
       await _firebaseAuth.currentUser!.delete();
     } on FirebaseAuthException catch (e) {
       return e.code;
