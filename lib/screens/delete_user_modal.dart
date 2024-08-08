@@ -15,6 +15,7 @@ class _DeleteUserModalState extends State<DeleteUserModal> {
   final _senhaController = TextEditingController();
   final _user = FirebaseAuth.instance.currentUser;
   final AuthService authService = AuthService();
+  String? _erroMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -43,30 +44,43 @@ class _DeleteUserModalState extends State<DeleteUserModal> {
           },
         ),
       ),
-      actions: <TextButton>[
-        TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('Cancelar')),
-        TextButton(
-            onPressed: () async {
-              if (_formKey.currentState!.validate()) {
-                await authService
-                    .excluirConta(senha: _senhaController.text)
-                    .then((String? erro) {
+      actions: [
+        if (_erroMessage != null) ...[
+          Center(
+            child: Text(
+              _erroMessage!,
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton(
+                onPressed: () {
                   Navigator.of(context).pop();
-                  if (erro != null) {
-                    final snackBar = SnackBar(
-                      content: Text('Erro ao excluir usuário'),
-                      backgroundColor: Colors.red,
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  }
-                });
-              }
-            },
-            child: Text('Exclusão de usuário.'))
+                },
+                child: Text('Cancelar')),
+            TextButton(
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  await authService
+                      .excluirConta(senha: _senhaController.text)
+                      .then((String? erro) {
+                    if (erro != null) {
+                      setState(() {
+                        _erroMessage = erro;
+                      });
+                    } else {
+                      Navigator.of(context).pop();
+                    }
+                  });
+                }
+              },
+              child: Text('Excluir usuário'),
+            ),
+          ],
+        ),
       ],
     );
   }
