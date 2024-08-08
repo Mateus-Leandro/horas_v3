@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:horas_v3/screens/delete_user_modal.dart';
 import 'package:horas_v3/services/auth_service.dart';
 
+import '../screens/passwordChangeModal.dart';
+
 class Menu extends StatelessWidget {
   final User user;
 
@@ -22,17 +24,22 @@ class Menu extends StatelessWidget {
               ),
             ),
             accountName:
-                Text((user.displayName != null) ? user.displayName! : ''),
+            Text((user.displayName != null) ? user.displayName! : ''),
             accountEmail: Text(user.email!),
           ),
-          ListTile(
-            leading: Icon(Icons.logout),
-            title: const Text('Sair'),
-            onTap: () {
-              AuthService().deslogar();
-            },
-          ),
-          Spacer(),
+          if (!googleUser()) ...{
+            ListTile(
+              leading: Icon(Icons.key),
+              title: const Text('Alterar Senha'),
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return PasswordChangeModal();
+                    });
+              },
+            ),
+          },
           ListTile(
             leading: Icon(Icons.delete),
             title: const Text('Excluir Conta'),
@@ -43,9 +50,26 @@ class Menu extends StatelessWidget {
                     return DeleteUserModal();
                   });
             },
-          )
+          ),
+          Spacer(),
+          ListTile(
+            leading: Icon(Icons.logout),
+            title: const Text('Sair'),
+            onTap: () {
+              AuthService().deslogar();
+            },
+          ),
         ],
       ),
     );
+  }
+
+  bool googleUser() {
+    for (final userInfo in user.providerData) {
+      if (userInfo.providerId == 'google.com') {
+        return true;
+      }
+    }
+    return false;
   }
 }

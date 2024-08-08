@@ -10,7 +10,7 @@ class AuthService {
       await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: senha);
     } on FirebaseAuthException catch (e) {
-      return erroLogin(e);
+      return erroAuth(e);
     }
     return null;
   }
@@ -34,7 +34,7 @@ class AuthService {
       UserCredential userCredential = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: senha);
     } on FirebaseAuthException catch (e) {
-      return erroLogin(e);
+      return erroAuth(e);
     }
     return null;
   }
@@ -43,7 +43,7 @@ class AuthService {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
-      return erroLogin(e);
+      return erroAuth(e);
     }
     return null;
   }
@@ -57,7 +57,7 @@ class AuthService {
     return null;
   }
 
-  Future<String?> erroLogin(FirebaseAuthException e) async {
+  Future<String?> erroAuth(FirebaseAuthException e) async {
     switch (e.code) {
       case 'user-not-found':
         return 'Usuário não encontrado';
@@ -68,9 +68,12 @@ class AuthService {
       case 'email-already-in-use':
         return 'O email já está em uso.';
       case 'invalid-credential':
-        return 'Email e/ou senha inválido.';
+        return 'Credenciais inválidas.';
+      case 'weak-password':
+        return 'Senha fraca';
+      default:
+        return 'Erro, tente novamente.';
     }
-    return e.code;
   }
 
   Future<String?> excluirConta({required String? senha}) async {
@@ -83,9 +86,24 @@ class AuthService {
       }
       await _firebaseAuth.currentUser!.delete();
     } on FirebaseAuthException catch (e) {
-      return e.code;
+      return erroAuth(e);
     }
 
+    return null;
+  }
+
+  Future<String?> alterarSenha(
+      {required String senhaAtual, required String novaSenha}) async {
+    try {
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: _firebaseAuth!.currentUser!.email!,
+        password: senhaAtual,
+      );
+      await _firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
+      await _firebaseAuth.currentUser!.updatePassword(novaSenha);
+    } on FirebaseAuthException catch (e) {
+      return erroAuth(e);
+    }
     return null;
   }
 }
