@@ -114,6 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     showModalBottomSheet(
+      isScrollControlled: true,
       context: context,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
@@ -121,81 +122,83 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       builder: (context) {
-        return Container(
-          height: MediaQuery.of(context).size.height,
-          padding: EdgeInsets.all(32),
-          child: ListView(
-            children: [
-              Text(title, style: Theme.of(context).textTheme.headlineSmall),
-              TextFormField(
-                controller: dataController,
-                keyboardType: TextInputType.datetime,
-                decoration: InputDecoration(
-                  hintText: '01/01/2024',
-                  labelText: 'Data',
-                ),
-                inputFormatters: [dataMaskFormatter],
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: minutosController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  hintText: '00:00',
-                  labelText: 'Horas trabalhadas',
-                ),
-                inputFormatters: [minutosMaskFormatter],
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: descricaoController,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                    hintText: 'Lembrete do que você fez',
-                    labelText: 'Descrição'),
-              ),
-              SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text(skipButton),
+        return SingleChildScrollView(
+          child: Container(
+            height: MediaQuery.of(context).size.height - 180,
+            padding: EdgeInsets.all(32),
+            child: ListView(
+              children: [
+                Text(title, style: Theme.of(context).textTheme.headlineSmall),
+                TextFormField(
+                  controller: dataController,
+                  keyboardType: TextInputType.datetime,
+                  decoration: InputDecoration(
+                    hintText: '01/01/2024',
+                    labelText: 'Data',
                   ),
-                  SizedBox(width: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      Hour hour = Hour(
-                          id: const Uuid().v1(),
-                          data: dataController.text,
-                          minutos: HourHelpers.hoursToMinutos(
-                            minutosController.text,
-                          ));
-                      if (descricaoController.text != "") {
-                        hour.descricao = descricaoController.text;
-                      }
-
-                      if (model != null) {
-                        hour.id = model.id;
-                      }
-
-                      firestore
-                          .collection(widget.user.uid)
-                          .doc(hour.id)
-                          .set(hour.toMap());
-
-                      refresh();
-
-                      Navigator.pop(context);
-                    },
-                    child: Text(confirmationButton),
+                  inputFormatters: [dataMaskFormatter],
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: minutosController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    hintText: '00:00',
+                    labelText: 'Horas trabalhadas',
                   ),
-                ],
-              ),
-              SizedBox(height: 180)
-            ],
+                  inputFormatters: [minutosMaskFormatter],
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: descricaoController,
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                      hintText: 'Lembrete do que você fez',
+                      labelText: 'Descrição'),
+                ),
+                SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(skipButton),
+                    ),
+                    SizedBox(width: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        Hour hour = Hour(
+                            id: const Uuid().v1(),
+                            data: dataController.text,
+                            minutos: HourHelpers.hoursToMinutos(
+                              minutosController.text,
+                            ));
+                        if (descricaoController.text != "") {
+                          hour.descricao = descricaoController.text;
+                        }
+
+                        if (model != null) {
+                          hour.id = model.id;
+                        }
+
+                        firestore
+                            .collection(widget.user.uid)
+                            .doc(hour.id)
+                            .set(hour.toMap());
+
+                        refresh();
+
+                        Navigator.pop(context);
+                      },
+                      child: Text(confirmationButton),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 180)
+              ],
+            ),
           ),
         );
       },
