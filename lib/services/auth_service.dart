@@ -33,6 +33,9 @@ class AuthService {
     try {
       UserCredential userCredential = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: senha);
+      User? newUser = userCredential.user;
+      await newUser?.updateDisplayName(nome);
+      await newUser?.reload();
     } on FirebaseAuthException catch (e) {
       return erroAuth(e);
     }
@@ -96,7 +99,7 @@ class AuthService {
       {required String senhaAtual, required String novaSenha}) async {
     try {
       AuthCredential credential = EmailAuthProvider.credential(
-        email: _firebaseAuth!.currentUser!.email!,
+        email: _firebaseAuth.currentUser!.email!,
         password: senhaAtual,
       );
       await _firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
